@@ -9,9 +9,9 @@
 #define MAX_VERTEX_NUM 510
 #define maxstep 100000000
 #define jump 10
-int vconflict[510]; //0ºÅ±íÊ¾¸öÊı£¬Ê£ÓàÎª³åÍ»½áµã
-int vconflict2[510][3]; //µÚÒ»Î»Îª¸Ä½áµãÔÚconflictÖĞµÄÎ»ÖÃ£¬µÚ¶şÎ»Îª½û¼ÉÑÕÉ«£¬µÚÈıÎ»Îª¿ÉÔÙ´Î¸Ä±äµÄ²½Êı
-int conflictcolour[510][510];   //½áµã*ÑÕÉ«
+int vconflict[510]; //0å·è¡¨ç¤ºä¸ªæ•°ï¼Œå‰©ä½™ä¸ºå†²çªç»“ç‚¹
+int vconflict2[510][3]; //ç¬¬ä¸€ä½ä¸ºæ”¹ç»“ç‚¹åœ¨conflictä¸­çš„ä½ç½®ï¼Œç¬¬äºŒä½ä¸ºç¦å¿Œé¢œè‰²ï¼Œç¬¬ä¸‰ä½ä¸ºå¯å†æ¬¡æ”¹å˜çš„æ­¥æ•°
+int conflictcolour[510][510];   //ç»“ç‚¹*é¢œè‰²
 int colourtable[MAX_VERTEX_NUM];
 //int arcnum[MAX_VERTEX_NUM];
 
@@ -19,16 +19,16 @@ typedef int status;
 int times=0;
 
 
-typedef struct VNode {  //Í·½áµã
-	int date;   //¶¥µãĞÅÏ¢
+typedef struct VNode {  //å¤´ç»“ç‚¹
+	int date;   //é¡¶ç‚¹ä¿¡æ¯
 	int n;
 	int colour;
 	int arc[MAX_VERTEX_NUM];
 }VNode, AdjList[MAX_VERTEX_NUM];
 
-typedef struct { //ÁÚ½Ó±í
+typedef struct { //é‚»æ¥è¡¨
 	AdjList vertices;
-	int vexnum, arcnum; //Í¼µÄµ±Ç°¶¨µãÊıºÍ»¡Êı
+	int vexnum, arcnum; //å›¾çš„å½“å‰å®šç‚¹æ•°å’Œå¼§æ•°
 }ALGraph;
 
 int main(void) {
@@ -38,72 +38,44 @@ int main(void) {
 	char name[30];
 	int colour, i, step = 0, retu;
 	times=0;
-	printf("ÇëÊäÈëÎÄ¼şÃû³Æ£º ");
+	printf("è¯·è¾“å…¥æ–‡ä»¶åç§°ï¼š ");
 	scanf("%s", name);
 	getchar();
 
-	printf("ÇëÊäÈëÑÕÉ«ÊıÁ¿£º ");
+	printf("è¯·è¾“å…¥é¢œè‰²æ•°é‡ï¼š ");
 
 	scanf("%d", &colour);
 	getchar();
 	caculate(&vexnum, &arcnum, vertices, colour,name);
-	/*printf("color*");
-	Colouring(graph, colour);
-	vconflicttable(graph);
-	printf("\n%d", vconflict[0]);
-	for (i = 1; i <= graph->vexnum; i++) {
-		printf("*%d %d ", i, graph->vertices[i].colour);
-	}
-	step = 0;
-	//printf("coloring:");
-	int num = 1;
-	retu = changecolour(&step, graph, colour, num);
-
-	if (retu = 0) printf("FALL\n\n");
-	printf("STEP: %d\n", step);
-	printf("\n%d", vconflict[0]);
-	for (i = 1; i <= graph->vexnum; i++) {
-		printf("*%d %d ", i, graph->vertices[i].colour);
-	}
-*/
 	return 0;
 }
 
-status Read(int* vexnum, int*  arcnum,  AdjList vertices, char FileName[]) {  //ÎÄ¼ş¶ÁÈ¡
+status Read(int* vexnum, int*  arcnum,  AdjList vertices, char FileName[]) {  //æ–‡ä»¶è¯»å–
 	FILE *in;
 	int i = 0, flag, n, m;
 	char ch;
 
 	if ((in = fopen(FileName, "r")) == NULL) {
-		printf("\n    ¸ÃÎÄ¼ş²»´æÔÚ£¡\n");
+		printf("\n    è¯¥æ–‡ä»¶ä¸å­˜åœ¨ï¼\n");
 		return ERROR;
 	}
-	//printf("*");
 	fscanf(in, "%d %d\n", &(*vexnum), &(*arcnum));
-	//  printf("%d %d", graph->arcnum, graph->vexnum);
 	for (i = 1; i <= (*vexnum); i++) {
-		// graph->vertices[i].date=i;
 		(vertices[i]).n = 0;
-		//vertices[i].colour = 0;
 	}
 	// printf("+");
 	for (i = 0; i<(*arcnum); i++) {
 		fscanf(in, "%c %d %d\n", &ch, &m, &n);
 		(vertices[m].n)++;
 		(vertices[n].n)++;
-		//  printf("ook ");
 		vertices[m].arc[vertices[m].n - 1] = n;
-		//printf("+");
-		//graph->vertices[m].arc[graph->vertices[m].n - 1][1] = 0;
-		//  printf("1 ");
 		vertices[n].arc[vertices[n].n - 1] = m;
-		//graph->vertices[n].arc[graph->vertices[n].n - 1][1] = 0;
 	}
 	fclose(in);
 	return OK;
 }
 
-void Colouring(int* vexnum, int*  arcnum,  AdjList vertices, int colour) {//colourÖÖÑÕÉ«
+void Colouring(int* vexnum, int*  arcnum,  AdjList vertices, int colour) {//colourç§é¢œè‰²
 
 	int i = 0, j = 0, k = 0;
 	//    ArcNode *p=NULL;
@@ -112,13 +84,7 @@ void Colouring(int* vexnum, int*  arcnum,  AdjList vertices, int colour) {//colo
 
 		//vertices[i].colour = rand() % colour + 1;
 		colourtable[i]=rand() % colour + 1;
-	}//ËùÓĞµã×ÅÉ«
-	 /*	for (i = 1; i <= graph->vexnum; i++) {
-	 for (j = 0; j<graph->vertices[i].n; j++) {
-	 k = graph->vertices[i].arc[j][0];
-	 graph->vertices[i].arc[j][1] = graph->vertices[j].colour;
-	 }
-	 }*/
+	}//æ‰€æœ‰ç‚¹ç€è‰²
 	return;
 }
 
@@ -131,69 +97,67 @@ void vconflicttable(int*vexnum, int*  arcnum,  AdjList vertices) {
 		vconflict2[i][0] = 0;
 		vconflict2[i][2] = 0;
 		vconflict[i]=0;
-	}//³õÊ¼»¯½û¼É±í£¬ËùÓĞ½áµã¶¼²»ÔÚ½û¼É±íÖĞ
+	}//åˆå§‹åŒ–ç¦å¿Œè¡¨ï¼Œæ‰€æœ‰ç»“ç‚¹éƒ½ä¸åœ¨ç¦å¿Œè¡¨ä¸­
 	for (i = 1; i <= (*vexnum); i++) {
 		for (j = 0; j <= MAX_VERTEX_NUM; j++)
-			conflictcolour[i][j] = 0;//³õÊ¼»¯¸Ãµã¶ÔÓ¦³åÍ»±í
+			conflictcolour[i][j] = 0;//åˆå§‹åŒ–è¯¥ç‚¹å¯¹åº”å†²çªè¡¨
 									 //flag=0;
 		p = vertices[i];
 		for (j = 0; j<p.n; j++) {
             qnum=p.arc[j];
 			pcolour = colourtable[qnum];
 			//pnum=p.arc[j][0];
-			++conflictcolour[i][pcolour];//³åÍ»±íÍ³¼ÆÑÕÉ«
+			++conflictcolour[i][pcolour];//å†²çªè¡¨ç»Ÿè®¡é¢œè‰²
 		}
 		col =colourtable[i];
 		if (conflictcolour[i][col] != 0) {
 			vconflict[0]++;
 			confnum = vconflict[0];
 			vconflict[confnum] = i;
-			vconflict2[i][0] = confnum;//½û¼É±íÖĞÎ»ÖÃ
-			vconflict2[i][1] = col;//½û¼ÉÑÕÉ«
+			vconflict2[i][0] = confnum;//ç¦å¿Œè¡¨ä¸­ä½ç½®
+			vconflict2[i][1] = col;//ç¦å¿Œé¢œè‰²
 			vconflict2[i][2]=0;
 		}
-	}//ËùÓĞµã
+	}//æ‰€æœ‰ç‚¹
 }
-//caculate(vexnum, arcnum, vertices, colour,name);
 
 int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int colour) {
 	int k = 0;
 	int oldconf = 0, newconf = 0;
-		int best = 0, pbest = 0;//best±íÊ¾³åÍ»½áµãÊı£¬pbest±íÊ¾Ô­±¾³åÍ»½ÚµãÊı
+		int best = 0, pbest = 0;//bestè¡¨ç¤ºå†²çªç»“ç‚¹æ•°ï¼Œpbestè¡¨ç¤ºåŸæœ¬å†²çªèŠ‚ç‚¹æ•°
 		int vnum = 0, i = 0, col = 0, num = 0;
-		int bestchoice[MAX_VERTEX_NUM];//´æ·Å¹©Ñ¡ÔñµÄ³åÍ»½áµã
-		int n = 0, j = 0;//n±íÊ¾¸Ã½áµã±ßÊı,k±êÖÂÊÇ·ñÏİÈë¾Ö²¿×îÓÅ½â
-		int conf;//¿É¹©Ñ¡ÔñµÄ½áµã¸öÊı
-		int newcolnum = 0;	//ĞÂÑ¡ÔñµÄÑÕÉ«ÔÚ×î¼ÑÑ¡ÔñÊı×éÖĞÎ»ÖÃ
-		int newcol;//ĞÂÑ¡ÔñµÄÑÕÉ«
+		int bestchoice[MAX_VERTEX_NUM];//å­˜æ”¾ä¾›é€‰æ‹©çš„å†²çªç»“ç‚¹
+		int n = 0, j = 0;//nè¡¨ç¤ºè¯¥ç»“ç‚¹è¾¹æ•°,kæ ‡è‡´æ˜¯å¦é™·å…¥å±€éƒ¨æœ€ä¼˜è§£
+		int conf;//å¯ä¾›é€‰æ‹©çš„ç»“ç‚¹ä¸ªæ•°
+		int newcolnum = 0;	//æ–°é€‰æ‹©çš„é¢œè‰²åœ¨æœ€ä½³é€‰æ‹©æ•°ç»„ä¸­ä½ç½®
+		int newcol;//æ–°é€‰æ‹©çš„é¢œè‰²
 				   //int conflict, confnum, location, conflict2, flag = 0;
-		int confnum;//³åÍ»±íÖĞ½áµã¸öÊı
-		int location;//³åÍ»½áµãÔÚ³åÍ»±íÖĞµÄÎ»ÖÃ
+		int confnum;//å†²çªè¡¨ä¸­ç»“ç‚¹ä¸ªæ•°
+		int location;//å†²çªç»“ç‚¹åœ¨å†²çªè¡¨ä¸­çš„ä½ç½®
 		int conflictnum = vconflict[0];
 		int pvconf0, vconf0;
 		int colconf=0;
-		int lastnum=0;//³åÍ»±íÖĞ×îºóÒ»Î»ĞèÒªÒÆ¶¯µÄ½áµã
+		int lastnum=0;//å†²çªè¡¨ä¸­æœ€åä¸€ä½éœ€è¦ç§»åŠ¨çš„ç»“ç‚¹
 	while (vconflict[0] > 0 && (*step) < maxstep) {
 		(*step)++;
         conflictnum = vconflict[0];
-		num = rand() % conflictnum + 1;	//Ñ¡È¡Òª¸Ä±äµÄ½áµãÔÚ³åÍ»±íÖĞµÄÎ»ÖÃ
-		vnum = vconflict[num];	//Òª¸Ä±äµÄ½áµã
+		num = rand() % conflictnum + 1;	//é€‰å–è¦æ”¹å˜çš„ç»“ç‚¹åœ¨å†²çªè¡¨ä¸­çš„ä½ç½®
+		vnum = vconflict[num];	//è¦æ”¹å˜çš„ç»“ç‚¹
 
     //    printf("\n*%d %d ", vconflict[0], vnum);
 
 		VNode p = vertices[vnum];
-		col = colourtable[vnum];//Ô­±¾ÑÕÉ«
-				pbest = 0;	//Ô­±¾ÑÕÉ«µÄ³åÍ»½áµã¸öÊı
+		col = colourtable[vnum];//åŸæœ¬é¢œè‰²
+				pbest = 0;	//åŸæœ¬é¢œè‰²çš„å†²çªç»“ç‚¹ä¸ªæ•°
         for (j = 0; j < n; j++) {
 				int qnum = vertices[vnum].arc[j];
 				oldconf = 0;
 				oldconf = conflictcolour[qnum][col];
 				int qcol = colourtable[qnum];
-				if (oldconf ==1 && qcol == col) {//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
-                    pbest++;	//Ô­±¾ÑÕÉ«µÄ³åÍ»½áµã¸öÊı
+				if (oldconf ==1 && qcol == col) {//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
+                    pbest++;	//åŸæœ¬é¢œè‰²çš„å†²çªç»“ç‚¹ä¸ªæ•°
 				}
 			}
-
 		best = pbest;
 		clear(bestchoice);
 		bestchoice[0]=0;
@@ -201,8 +165,7 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
 		colconf=0;
         n = p.n;
         newcol=i;
-        if (conflictcolour[vnum][i] == 0){//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
-		//	        printf("\n   *QAQ   "   );
+        if (conflictcolour[vnum][i] == 0){//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
             colconf--;
         }
         for (j = 0; j < n; j++) {
@@ -211,31 +174,24 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
             newconf =conflictcolour[qnum][newcol];
             oldconf = conflictcolour[qnum][col];
             int qcol = colourtable[qnum];
-            if (newconf == 0 && qcol == newcol) {//Ô­±¾²»³åÍ»ÏÖÔÚ³åÍ»
-                //	    printf("   *QAQ+   "   );
+            if (newconf == 0 && qcol == newcol) {//åŸæœ¬ä¸å†²çªç°åœ¨å†²çª
                 colconf++;
             }
-            if (oldconf == 1 && qcol == col) {//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
-                //	    printf("   *QAQ-   "   );
+            if (oldconf == 1 && qcol == col) {//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
                 colconf--;
             }
         }
-                //printf("p %d n %d",pbest, colconf);
-				best = colconf;
-				clear(&bestchoice);
-				bestchoice[0] = 1;
-				bestchoice[1] = i;
-
-
-
-		for (i = 1; i <= colour; i++) {
+	best = colconf;
+	clear(&bestchoice);
+	bestchoice[0] = 1;
+	bestchoice[1] = i;
+	for (i = 1; i <= colour; i++) {
             if(i!=col){
 
                 colconf = pbest;
                 n = p.n;
                 newcol=i;
-                if (conflictcolour[vnum][i] == 0){//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
-		//	        printf("\n   *QAQ   "   );
+                if (conflictcolour[vnum][i] == 0){//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
                     colconf--;
                 }
                 for (j = 0; j < n; j++) {
@@ -244,17 +200,13 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
                     newconf =conflictcolour[qnum][newcol];
                     oldconf = conflictcolour[qnum][col];
                     int qcol = colourtable[qnum];
-                    if (newconf == 0 && qcol == newcol) {//Ô­±¾²»³åÍ»ÏÖÔÚ³åÍ»
-                //	    printf("   *QAQ+   "   );
+                    if (newconf == 0 && qcol == newcol) {//åŸæœ¬ä¸å†²çªç°åœ¨å†²çª
                         colconf++;
                     }
-                    if (oldconf == 1 && qcol == col) {//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
-                //	    printf("   *QAQ-   "   );
+                    if (oldconf == 1 && qcol == col) {//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
                         colconf--;
                     }
                 }
-                //printf("p %d n %d",pbest, colconf);
-            //else colconf=pbest;
                 if (colconf == best) {
                     bestchoice[0]++;
                     conf = bestchoice[0];
@@ -272,56 +224,42 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
 
 		newcolnum = 0;
 		pvconf0 = vconflict[0];
-	//	printf("num: %d %d %d %d ", bestchoice[0], best-pbest, best, pbest);
-	//	if (best <= pbest) {//¸Ä½øÓĞĞ§
-			//pvconf0 = vconflict[0];
-		//	printf("ok1");
 			while (newcolnum == 0) {
-				newcolnum = rand() % bestchoice[0] + 1;	//Ñ¡È¡Òª¸Ä±äµÄ½áµãµÄÎ»ÖÃ
-				newcol = bestchoice[newcolnum];//ĞÂÑÕÉ«
+				newcolnum = rand() % bestchoice[0] + 1;	//é€‰å–è¦æ”¹å˜çš„ç»“ç‚¹çš„ä½ç½®
+				newcol = bestchoice[newcolnum];//æ–°é¢œè‰²
 				if (newcol == vconflict2[vnum][1] && vconflict2[vnum][2] > *step) {
-					//ĞÂÑ¡Ôñ½áµã½û¼É
-					//if (bestchoice[0] == 1) {//½û¼É½áµãÎª×îÓÅÑ¡Ôñ
-					//	break;//½â½û
+					//æ–°é€‰æ‹©ç»“ç‚¹ç¦å¿Œ
+					//if (bestchoice[0] == 1) {//ç¦å¿Œç»“ç‚¹ä¸ºæœ€ä¼˜é€‰æ‹©
+					//	break;//è§£ç¦
 					//}
 					if (bestchoice[0] != 1) {
-						newcolnum = 0;//ÖØĞÂ½øÈëÑ­»·Ñ¡ÔñÑÕÉ«
+						newcolnum = 0;//é‡æ–°è¿›å…¥å¾ªç¯é€‰æ‹©é¢œè‰²
 					}
 				}
                     if(bestchoice[0]!=1&&newcol==col){
                         newcolnum = 0;
                     }
-		//		printf("ok2");
 			}
-		//	p=graph->vertices[vnum];
-		//	p.colour=newcol;
-		//	printf("+%d+", graph->vertices[vnum].colour);
 			colourtable[vnum]=newcol;
-			//			p=graph->vertices[vnum];
-
-		//	printf("%d*", p.colour);
     //    printf("col: %d new :%d %d", col, newcol, graph->vertices[vnum].colour);
 			vconflict2[vnum][2] = (*step) + 10;
 			vconflict2[vnum][1] = newcol;
-			if (conflictcolour[vnum][newcol] == 0) {//²»ÔÙ³åÍ»
+			if (conflictcolour[vnum][newcol] == 0) {//ä¸å†å†²çª
                     confnum = vconflict[0];
 					location = vconflict2[vnum][0];
 					vconflict2[vnum][0] = -1;
-					vconflict[location] = vconflict[confnum];//×îºóÒ»¸ö½áµãÇ°ÒÆ£¬Ô­±¾ÊÇ×îºóÒ»¸ö½áµãÒ²²»¸ÉÈÅ
+					vconflict[location] = vconflict[confnum];//æœ€åä¸€ä¸ªç»“ç‚¹å‰ç§»ï¼ŒåŸæœ¬æ˜¯æœ€åä¸€ä¸ªç»“ç‚¹ä¹Ÿä¸å¹²æ‰°
 					lastnum=vconflict[location];
 					if(lastnum!=vnum)
                         vconflict2[lastnum][0]=location;
 					vconflict[0]--;
 
 
-		//		printf("   QAQ %d  "  ,location );
 			}
 			//p = graph->vertices[num];
-      //      printf("ok3");
 			n = p.n;
 			colourtable[vnum] = newcol;
 			for (j = 0; j < n; j++) {
-     //               printf("ok4");
 				int qnum = p.arc[j];
 				oldconf = 0, newconf = 0;
 				newconf = conflictcolour[qnum][newcol];
@@ -329,54 +267,44 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
 				oldconf = conflictcolour[qnum][col];
 				conflictcolour[qnum][col]--;
 				int qcol = colourtable[qnum];
-       //     printf("ok5");
-				if (newconf == 0 && qcol == newcol) {//Ô­±¾²»³åÍ»ÏÖÔÚ³åÍ»
+				if (newconf == 0 && qcol == newcol) {//åŸæœ¬ä¸å†²çªç°åœ¨å†²çª
 					vconflict[0]++;
 					confnum = vconflict[0];
 					vconflict[confnum] = qnum;
 					vconflict2[qnum][0] = confnum;
-		//			printf("   QAQ+   %d" ,location  );
 				}
-				if (oldconf == 1 && qcol == col) {//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
+				if (oldconf == 1 && qcol == col) {//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
 					confnum = vconflict[0];
 					location = vconflict2[qnum][0];
 					vconflict2[qnum][0] = -1;
-					vconflict[location] = vconflict[confnum];//×îºóÒ»¸ö½áµãÇ°ÒÆ£¬Ô­±¾ÊÇ×îºóÒ»¸ö½áµãÒ²²»¸ÉÈÅ
+					vconflict[location] = vconflict[confnum];//æœ€åä¸€ä¸ªç»“ç‚¹å‰ç§»ï¼ŒåŸæœ¬æ˜¯æœ€åä¸€ä¸ªç»“ç‚¹ä¹Ÿä¸å¹²æ‰°
                     lastnum=vconflict[location];
                     if(lastnum!=qnum)
                         vconflict2[lastnum][0]=location;
 					vconflict[0]--;
-		//			printf("   QAQ-  %d " ,location  );
 				}
-//printf("ok6");
 			}
-
-		//}//useful*/
-		//printf("bestchoice: %d %d %d %d*", bestchoice[0], pbest, best, newcol);
-	/*	for(j=1; j<=bestchoice[0]; j++){
-            printf("%d ",bestchoice[j]);
-		}*/
 		vconf0 = vconflict[0];
 		if (vconf0 == pvconf0) {
 			k++;
 	//		printf("k: %d", k);
-			if (k >= (vconflict[0]*jump) ){//ÏİÈë¾Ö²¿×îÓÅ½â¶øÎŞ·¨Çó³ö×îÓÅ½â
+			if (k >= (vconflict[0]*jump) ){//é™·å…¥å±€éƒ¨æœ€ä¼˜è§£è€Œæ— æ³•æ±‚å‡ºæœ€ä¼˜è§£
 							//printf(" + ");
 				vnum = rand() % (*vexnum) + 1;
 //				printf("\n%d\n", vnum);
 				p = vertices[vnum];
-				col = colourtable[vnum];//Ô­±¾ÑÕÉ«
+				col = colourtable[vnum];//åŸæœ¬é¢œè‰²
 				newcol = rand() % colour + 1;
 				n = p.n;
 				p.colour = newcol;
 				colourtable[vnum]=newcol;
 				vconflict2[vnum][2] = (*step) + 10;
 				vconflict2[vnum][1] = newcol;
-				if (conflictcolour[vnum][newcol] != 0 && conflictcolour[vnum][col] == 0) {//ĞŞ¸ÄµÄ½áµãÔ­±¾²»³åÍ»ÏÖÔÚ³åÍ»
+				if (conflictcolour[vnum][newcol] != 0 && conflictcolour[vnum][col] == 0) {//ä¿®æ”¹çš„ç»“ç‚¹åŸæœ¬ä¸å†²çªç°åœ¨å†²çª
 					confnum = ++vconflict[0];
 					//location = vconflict2[vnum][0];
 					vconflict2[vnum][0] = confnum;
-					vconflict[confnum] = vnum;//×îºóÒ»¸ö½áµãÇ°ÒÆ£¬Ô­±¾ÊÇ×îºóÒ»¸ö½áµãÒ²²»¸ÉÈÅ
+					vconflict[confnum] = vnum;//æœ€åä¸€ä¸ªç»“ç‚¹å‰ç§»ï¼ŒåŸæœ¬æ˜¯æœ€åä¸€ä¸ªç»“ç‚¹ä¹Ÿä¸å¹²æ‰°
 				}
 				for (j = 0; j < n; j++) {
 					int qnum = p.arc[j];
@@ -384,17 +312,17 @@ int changecolour(int *step, int *vexnum, int * arcnum,  AdjList vertices, int co
 					newconf = ++conflictcolour[qnum][newcol];
 					oldconf = --conflictcolour[qnum][col];
 					int qcol = colourtable[qnum];
-					if (newconf == 1 && qcol == newcol) {//Ô­±¾²»³åÍ»ÏÖÔÚ³åÍ»
+					if (newconf == 1 && qcol == newcol) {//åŸæœ¬ä¸å†²çªç°åœ¨å†²çª
 						vconflict[0]++;
 						confnum = vconflict[0];
 						vconflict[confnum] = qnum;
 						vconflict2[qnum][0] = confnum;
 					}
-					if (oldconf == 0 && qcol == col) {//Ô­±¾³åÍ»ÏÖÔÚ²»³åÍ»
+					if (oldconf == 0 && qcol == col) {//åŸæœ¬å†²çªç°åœ¨ä¸å†²çª
 						confnum = vconflict[0];
 						location = vconflict2[qnum][0];
 						vconflict2[qnum][0] = 0;
-						vconflict[location] = vconflict[confnum];//×îºóÒ»¸ö½áµãÇ°ÒÆ£¬Ô­±¾ÊÇ×îºóÒ»¸ö½áµãÒ²²»¸ÉÈÅ
+						vconflict[location] = vconflict[confnum];//æœ€åä¸€ä¸ªç»“ç‚¹å‰ç§»ï¼ŒåŸæœ¬æ˜¯æœ€åä¸€ä¸ªç»“ç‚¹ä¹Ÿä¸å¹²æ‰°
 						vconflict[0]--;
 					}
 				}
@@ -420,11 +348,6 @@ void clear(int bestchoice[]) {
 		bestchoice[i] = 0;
 	}
 }
-
-
-
-
-//caculate(vexnum, arcnum, vertices, colour,name);
 void caculate(int* vexnum, int* arcnum,  AdjList vertices, int colour, char name[]) {
 	int i = 0;
 	Read(vexnum, arcnum, vertices, name);
@@ -441,8 +364,6 @@ void caculate(int* vexnum, int* arcnum,  AdjList vertices, int colour, char name
 	int num = 1, retu = 0;
 	retu = changecolour(&step, vexnum, arcnum, vertices, colour);
 	if (retu == 0) {
-        //times++;
-        //if(times>10){
             printf("FALL\n");
             printf("STEP: %d\n", step);
             printf( "%d", vconflict[0]);
@@ -451,24 +372,19 @@ void caculate(int* vexnum, int* arcnum,  AdjList vertices, int colour, char name
             }
 
             		for (i = 1; i <= (*vexnum); i++) {
-			printf("*%d %d ", i, colourtable[i]);
+			printf("%d ", colourtable[i]);
 		}
             return;
-       // }
-        //caculate(graph, colour, name);
 
 	}
 	else {
 		printf("\nSUCCESS\n");
 		printf("STEP: %d\n", step);
 		for (i = 1; i <= (*vexnum); i++) {
-			printf("*%d %d ", i, colourtable[i]);
+			printf("%d ", colourtable[i]);
 		}
 		caculate(vexnum, arcnum, vertices, colour - 1, name);
 	}
-
-
-
 }
 
 
