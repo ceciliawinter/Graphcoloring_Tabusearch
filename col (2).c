@@ -386,6 +386,3 @@ void caculate(int* vexnum, int* arcnum,  AdjList vertices, int colour, char name
 		caculate(vexnum, arcnum, vertices, colour - 1, name);
 	}
 }
-
-
-
